@@ -5,6 +5,15 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
 import AuthInput from "../components/uthInput";
+import Button from "../ui/Button";
+import {
+  AuthPage,
+  AuthCard,
+  AuthLeft,
+  AuthTitle,
+  AuthSubtitle,
+} from "../ui/AuthLayout";
+
 import "../styles/Auth.css";
 import hero from "../assets/hero.png";
 
@@ -44,13 +53,13 @@ export default function Login() {
   }
 
   return (
-    <main className="auth-page">
-      <section className="auth-card">
-        <div className="auth-left login-left">
-          <h1>Welcome Back</h1>
-          <p className="subtitle">
+    <AuthPage>
+      <AuthCard>
+        <AuthLeft $login>
+          <AuthTitle>Welcome Back</AuthTitle>
+          <AuthSubtitle $login>
             Login to continue managing your academic dashboard
-          </p>
+          </AuthSubtitle>
 
           <form onSubmit={handleSubmit(onSubmit)}>
             <AuthInput
@@ -69,9 +78,7 @@ export default function Login() {
               error={errors.password}
             />
 
-            <button className="signup-btn" type="submit">
-              Login
-            </button>
+            <Button type="submit">Login</Button>
 
             <div className="or">
               <span></span>
@@ -87,7 +94,7 @@ export default function Login() {
               Create new account
             </button>
           </form>
-        </div>
+        </AuthLeft>
 
         <div className="auth-right">
           <div className="gold-circle big"></div>
@@ -109,7 +116,7 @@ export default function Login() {
             all in one beautiful platform.
           </p>
         </div>
-      </section>
-    </main>
+      </AuthCard>
+    </AuthPage>
   );
 }

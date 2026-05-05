@@ -5,6 +5,15 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
 import AuthInput from "../components/uthInput";
+import Button from "../ui/Button";
+import {
+  AuthPage,
+  AuthCard,
+  AuthLeft,
+  AuthTitle,
+  AuthSubtitle,
+} from "../ui/AuthLayout";
+
 import "../styles/Auth.css";
 import hero from "../assets/hero.png";
 
@@ -54,11 +63,13 @@ export default function SignUp() {
   }
 
   return (
-    <main className="auth-page">
-      <section className="auth-card">
-        <div className="auth-left">
-          <h1>Create Account</h1>
-          <p className="subtitle">Join EduTrack and start your academic journey</p>
+    <AuthPage>
+      <AuthCard>
+        <AuthLeft>
+          <AuthTitle>Create Account</AuthTitle>
+          <AuthSubtitle>
+            Join EduTrack and start your academic journey
+          </AuthSubtitle>
 
           <form onSubmit={handleSubmit(onSubmit)}>
             <AuthInput
@@ -93,15 +104,13 @@ export default function SignUp() {
             />
 
             <label className="agree">
-              <input type="checkbox" defaultChecked />
+              <input type="checkbox" required defaultChecked />
               <span>
                 I agree to the <b>Terms of Service</b> and <b>Privacy Policy</b>
               </span>
             </label>
 
-            <button className="signup-btn" type="submit">
-              Sign Up
-            </button>
+            <Button type="submit">Sign Up</Button>
 
             <div className="or">
               <span></span>
@@ -117,7 +126,7 @@ export default function SignUp() {
               Already have an account? Login
             </button>
           </form>
-        </div>
+        </AuthLeft>
 
         <div className="auth-right">
           <div className="gold-circle big"></div>
@@ -139,7 +148,7 @@ export default function SignUp() {
             all in one beautiful platform.
           </p>
         </div>
-      </section>
-    </main>
+      </AuthCard>
+    </AuthPage>
   );
 }
