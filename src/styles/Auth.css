@@ -425,7 +425,24 @@ body {
   margin-top: 5px;
 }
 
-/* ANIMATIONS */
+.field-group {
+  margin-bottom: 12px;
+}
+
+.field-group .input-box {
+  margin-bottom: 0;
+}
+
+.input-error {
+  border-color: rgba(255, 128, 128, 0.75);
+  box-shadow: 0 0 0 3px rgba(255, 128, 128, 0.08);
+}
+
+.field-error {
+  margin: 6px 0 0 4px;
+  color: #ff8b8b;
+  font-size: 11px;
+}
 
 @keyframes floatHero {
   0% {

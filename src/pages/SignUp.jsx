@@ -1,41 +1,52 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+
+import AuthInput from "../components/uthInput";
 import "../styles/Auth.css";
 import hero from "../assets/hero.png";
+
+const schema = yup.object({
+  name: yup.string().required("Full name is required"),
+  email: yup
+    .string()
+    .email("Enter a valid email address")
+    .required("Email is required"),
+  password: yup
+    .string()
+    .min(6, "Password must be at least 6 characters")
+    .required("Password is required"),
+  confirmPassword: yup
+    .string()
+    .oneOf([yup.ref("password")], "Passwords do not match")
+    .required("Confirm password is required"),
+});
 
 export default function SignUp() {
   const navigate = useNavigate();
   const { signup } = useAuth();
 
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
   });
 
-  const [error, setError] = useState("");
-
-  function handleChange(e) {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
-  }
-
-  function handleSubmit(e) {
-    e.preventDefault();
-
+  function onSubmit(data) {
     const result = signup(
-      form.name,
-      form.email,
-      form.password,
-      form.confirmPassword
+      data.name,
+      data.email,
+      data.password,
+      data.confirmPassword
     );
 
     if (!result.success) {
-      setError(result.message);
+      setError("email", { message: result.message });
       return;
     }
 
@@ -47,67 +58,46 @@ export default function SignUp() {
       <section className="auth-card">
         <div className="auth-left">
           <h1>Create Account</h1>
-          <p className="subtitle">
-            Join EduTrack and start your academic journey
-          </p>
+          <p className="subtitle">Join EduTrack and start your academic journey</p>
 
-          {/* FORM */}
-          <form onSubmit={handleSubmit}>
-            <div className="input-box">
-              <span>♡</span>
-              <input
-                type="text"
-                name="name"
-                placeholder="Full Name"
-                value={form.name}
-                onChange={handleChange}
-              />
-            </div>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <AuthInput
+              icon="♡"
+              placeholder="Full Name"
+              register={register("name")}
+              error={errors.name}
+            />
 
-            <div className="input-box">
-              <span>✉</span>
-              <input
-                type="email"
-                name="email"
-                placeholder="Email Address"
-                value={form.email}
-                onChange={handleChange}
-              />
-            </div>
+            <AuthInput
+              icon="✉"
+              type="email"
+              placeholder="Email Address"
+              register={register("email")}
+              error={errors.email}
+            />
 
-            <div className="input-box">
-              <span>⌕</span>
-              <input
-                type="password"
-                name="password"
-                placeholder="Password"
-                value={form.password}
-                onChange={handleChange}
-              />
-              <small>◎</small>
-            </div>
+            <AuthInput
+              icon="⌕"
+              type="password"
+              placeholder="Password"
+              register={register("password")}
+              error={errors.password}
+            />
 
-            <div className="input-box">
-              <span>⌕</span>
-              <input
-                type="password"
-                name="confirmPassword"
-                placeholder="Confirm Password"
-                value={form.confirmPassword}
-                onChange={handleChange}
-              />
-              <small>◎</small>
-            </div>
+            <AuthInput
+              icon="⌕"
+              type="password"
+              placeholder="Confirm Password"
+              register={register("confirmPassword")}
+              error={errors.confirmPassword}
+            />
 
             <label className="agree">
               <input type="checkbox" defaultChecked />
               <span>
-                I agree to the <b>Terms of Service</b> and{" "}
-                <b>Privacy Policy</b>
+                I agree to the <b>Terms of Service</b> and <b>Privacy Policy</b>
               </span>
             </label>
-
-            {error && <p className="auth-error">{error}</p>}
 
             <button className="signup-btn" type="submit">
               Sign Up
@@ -129,7 +119,6 @@ export default function SignUp() {
           </form>
         </div>
 
-        {/* RIGHT SIDE (ما غيرناها) */}
         <div className="auth-right">
           <div className="gold-circle big"></div>
           <div className="gold-circle small"></div>
