@@ -6,6 +6,11 @@ const Card = styled.div`
   border-radius: ${({ theme }) => theme.radius.lg};
   box-shadow: ${({ theme }) => theme.shadow.card};
   padding: 20px;
+  transition: 0.25s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
 `;
 
 export default Card;

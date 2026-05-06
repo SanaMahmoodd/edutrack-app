@@ -1,5 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import Button from "../ui/Button";
+
 import "../styles/Dashboard.css";
 
 export default function Dashboard() {
@@ -15,11 +17,25 @@ export default function Dashboard() {
     <div className="dashboard-page">
       <div className="dashboard-card">
         <h1>Welcome, {user?.name || "User"} 👋</h1>
+
         <p>{user?.email}</p>
 
-        <button className="logout-btn" onClick={handleLogout}>
+        <Button
+          type="button"
+          onClick={() => navigate("/students")}
+        >
+          Go To Students
+        </Button>
+
+        <br />
+        <br />
+
+        <Button
+          type="button"
+          onClick={handleLogout}
+        >
           Logout
-        </button>
+        </Button>
       </div>
     </div>
   );
