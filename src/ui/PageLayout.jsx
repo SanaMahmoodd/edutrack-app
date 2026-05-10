@@ -16,8 +16,8 @@ export const Page = styled.main`
 `;
 
 export const Container = styled.div`
-  width: min(1100px, 100%);
-  margin: 0 auto;
+  width: min(1180px, calc(100% - 32px));
+  margin: 32px auto 0;
 `;
 
 export const Header = styled.div`
@@ -39,5 +39,6 @@ export const Subtitle = styled.p`
 export const Grid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 18px;
+  gap: 32px;
+  margin-top: 14px;
 `;
