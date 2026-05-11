@@ -1,87 +1,118 @@
-# EduTrack App
+# EduTrack — Full Stack Student Management Dashboard
 
-EduTrack is a React web application built as part of the final training stage: **Advanced React + Real-World Project**.
+EduTrack is a modern full stack academic management platform designed to simplify student administration workflows through a clean and professional interface.
 
-The project focuses on authentication, form validation, protected routes, and reusable UI styling using Styled Components.
-
----
-
-## Tasks Covered
-
-### 1. Authentication & Protected Routes
-
-#### Topics
-- Mock authentication flow
-- Protected routes with React Router
-- Persisting user state using LocalStorage
-
-#### Implemented Features
-- Login page
-- Sign Up page
-- Logout functionality
-- AuthContext for managing user sessions
-- Protected route for private pages
-- Redirect unauthorized users to the login page
-- Store authenticated user data in LocalStorage
+The system allows administrators to manage students, courses, reports, and profile settings while integrating a Flask backend API with a React frontend application.
 
 ---
 
-### 2. Advanced Forms & Validation
+# Features
 
-#### Topics
-- react-hook-form library
-- Schema-based validation using Yup
-- Error messages and reusable inputs
-
-#### Implemented Features
-- Refactored registration form using react-hook-form
-- Added Yup validation schema
-- Added validation feedback messages
-- Reusable AuthInput component
-- Login form validation
-- Sign Up form validation
-- Password confirmation validation
-
----
-
-### 3. UI & Styling Systems
-
-#### Topics
-- CSS Modules vs Styled Components
-- Theming and responsive design
-- Component-level design consistency
-
-#### Implemented Features
-- Simple design system using a theme file
-- Styled Components setup
-- ThemeProvider integration
-- Reusable UI components:
-  - Button
-  - Card
-  - Alert
-- Reusable styled AuthInput component
-- Consistent colors, spacing, border radius, and shadows
-- Responsive layout for authentication pages
-- Clean and reusable UI structure
+- Authentication System (Login / Register)
+- Protected Routes
+- Student Management
+- Add / Edit / Delete Students
+- Course Management
+- Reports & CSV Export
+- Profile Management
+- Profile Image Upload
+- Search, Filters & Pagination
+- Responsive Modern UI
+- Full Backend API Integration
+- LocalStorage Session Persistence
 
 ---
 
-## Technologies Used
+# Tech Stack
 
+## Frontend
 - React
-- Vite
 - React Router
-- React Hook Form
-- Yup
 - Styled Components
-- LocalStorage
-- CSS
+- Axios
+- React Hook Form
+- Yup Validation
+- Vite
+
+## Backend
+- Flask
+- Flask SQLAlchemy
+- Flask CORS
+- JWT Authentication
+- SQLite Database
 
 ---
 
-## How to Run
+# Project Structure
 
 ```bash
+frontend/
+backend/
+```
+
+---
+
+# Installation
+
+## Frontend
+
+```bash
+cd frontend
 npm install
 npm run dev
 ```
+
+## Backend
+
+```bash
+cd backend
+
+python -m venv venv
+
+# Windows
+venv\Scripts\activate
+
+pip install -r requirements.txt
+
+python seed.py
+python app.py
+```
+
+---
+
+# API Endpoints
+
+## Authentication
+- POST `/api/auth/register`
+- POST `/api/auth/login`
+
+## Profile
+- PUT `/api/auth/profile`
+
+## Students
+- GET `/api/students`
+- POST `/api/students`
+
+## Courses
+- GET `/api/courses`
+- POST `/api/courses`
+
+---
+
+# UI Highlights
+
+- Glassmorphism Design
+- Luxury Dark Theme
+- Gold Accent Colors
+- Animated Background Effects
+- Responsive Layout
+- Professional Dashboard Components
+
+---
+
+# Author
+
+Designed & Developed by Sana Saleh
+
+GitHub:
+https://github.com/SanaMahmoodd
