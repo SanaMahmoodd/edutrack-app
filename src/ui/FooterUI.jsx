@@ -106,3 +106,31 @@ export const StatusBadge = styled.span`
   color: ${({ theme }) => theme.colors.goldLight};
   font-weight: 700;
 `;
+
+export const SocialLinks = styled.div`
+  display: flex;
+  gap: 10px;
+`;
+
+export const SocialIcon = styled.a`
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  text-decoration: none;
+
+  color: ${({ theme }) => theme.colors.goldLight};
+
+  background: rgba(255, 255, 255, 0.04);
+
+  border: 1px solid rgba(231, 189, 105, 0.22);
+
+  transition: 0.25s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    border-color: ${({ theme }) => theme.colors.gold};
+    box-shadow: 0 10px 25px rgba(231, 189, 105, 0.15);
+  }
+`;

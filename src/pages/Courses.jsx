@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -8,7 +8,14 @@ import useNotification from "../hooks/useNotification";
 import Button from "../ui/Button";
 import Card from "../ui/Card";
 
-import { Page, Container, Header, Title, Subtitle, Grid } from "../ui/PageLayout";
+import {
+  Page,
+  Container,
+  Header,
+  Title,
+  Subtitle,
+  Grid,
+} from "../ui/PageLayout";
 
 import {
   Form,
@@ -21,19 +28,38 @@ import {
   StudentHeaderCard,
 } from "../ui/StudentUI";
 
-export default function Courses() {
-  const [courses, setCourses] = useState([
-    { id: 1, name: "React", students: 28 },
-    { id: 2, name: "Python", students: 22 },
-    { id: 3, name: "Flask", students: 18 },
-  ]);
+import {
+  getCourses,
+  createCourse,
+  updateCourse,
+  deleteCourse,
+} from "../api/courseService";
 
+export default function Courses() {
+  const [courses, setCourses] = useState([]);
   const [courseName, setCourseName] = useState("");
   const [editingId, setEditingId] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const { notification, showNotification } = useNotification();
 
-  function handleSubmit(e) {
+  useEffect(() => {
+    async function fetchCourses() {
+      try {
+        const data = await getCourses();
+        setCourses(data);
+      } catch (error) {
+        console.error("Failed to fetch courses:", error);
+        showNotification("Failed to load courses.", "error");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchCourses();
+  }, []);
+
+  async function handleSubmit(e) {
     e.preventDefault();
 
     if (!courseName.trim()) {
@@ -42,27 +68,41 @@ export default function Courses() {
     }
 
     if (editingId) {
-      setCourses(
-        courses.map((course) =>
-          course.id === editingId ? { ...course, name: courseName } : course
-        )
-      );
+      try {
+        const updatedCourse = await updateCourse(editingId, {
+          name: courseName,
+        });
 
-      setEditingId(null);
-      setCourseName("");
-      showNotification("Course updated successfully.");
+        setCourses(
+          courses.map((course) =>
+            course.id === editingId ? updatedCourse : course
+          )
+        );
+
+        setEditingId(null);
+        setCourseName("");
+        showNotification("Course updated successfully.");
+      } catch (error) {
+        console.error("Failed to update course:", error);
+        showNotification("Failed to update course.", "error");
+      }
+
       return;
     }
 
-    const newCourse = {
-      id: Date.now(),
-      name: courseName,
-      students: 0,
-    };
+    try {
+      const newCourse = await createCourse({
+        name: courseName,
+        students: 0,
+      });
 
-    setCourses([newCourse, ...courses]);
-    setCourseName("");
-    showNotification("Course added successfully.");
+      setCourses([newCourse, ...courses]);
+      setCourseName("");
+      showNotification("Course added successfully.");
+    } catch (error) {
+      console.error("Failed to add course:", error);
+      showNotification("Failed to add course.", "error");
+    }
   }
 
   function handleEdit(course) {
@@ -80,15 +120,36 @@ export default function Courses() {
     setCourseName("");
   }
 
-  function handleDelete(id) {
+  async function handleDelete(id) {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete this course?"
     );
 
     if (!confirmDelete) return;
 
-    setCourses(courses.filter((course) => course.id !== id));
-    showNotification("Course deleted successfully.");
+    try {
+      await deleteCourse(id);
+
+      setCourses(courses.filter((course) => course.id !== id));
+      showNotification("Course deleted successfully.");
+    } catch (error) {
+      console.error("Failed to delete course:", error);
+      showNotification("Failed to delete course.", "error");
+    }
+  }
+
+  if (loading) {
+    return (
+      <Page>
+        <Navbar />
+
+        <Container>
+          <Subtitle>Loading courses...</Subtitle>
+        </Container>
+
+        <Footer />
+      </Page>
+    );
   }
 
   return (
@@ -121,7 +182,7 @@ export default function Courses() {
             />
 
             <Input
-              type="number"
+              type="text"
               placeholder="Students count"
               disabled
               value={editingId ? "Auto managed" : "0"}
@@ -147,7 +208,9 @@ export default function Courses() {
             <Card key={course.id}>
               <StudentName>{course.name}</StudentName>
 
-              <StudentEmail>{course.students} students enrolled</StudentEmail>
+              <StudentEmail>
+                {course.students} students enrolled
+              </StudentEmail>
 
               <Actions>
                 <ActionButton type="button" onClick={() => handleEdit(course)}>

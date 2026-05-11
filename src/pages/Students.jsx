@@ -43,11 +43,7 @@ import {
 
 export default function Students() {
   const [students, setStudents] = useState([]);
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-  });
-
+  const [form, setForm] = useState({ name: "", email: "" });
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -56,11 +52,8 @@ export default function Students() {
   const [currentPage, setCurrentPage] = useState(1);
 
   const navigate = useNavigate();
-
   const studentsPerPage = 6;
-
-  const { notification, showNotification } =
-    useNotification();
+  const { notification, showNotification } = useNotification();
 
   useEffect(() => {
     async function fetchStudents() {
@@ -68,15 +61,8 @@ export default function Students() {
         const data = await getStudents();
         setStudents(data);
       } catch (error) {
-        console.error(
-          "Failed to fetch students:",
-          error
-        );
-
-        showNotification(
-          "Failed to load students.",
-          "error"
-        );
+        console.error("Failed to fetch students:", error);
+        showNotification("Failed to load students.", "error");
       } finally {
         setLoading(false);
       }
@@ -85,137 +71,81 @@ export default function Students() {
     fetchStudents();
   }, []);
 
-  const filteredStudents = students.filter(
-    (student) => {
-      const searchMatch =
-        student.name
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase()) ||
-        student.email
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase());
+  const filteredStudents = students.filter((student) => {
+    const searchMatch =
+      student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.email.toLowerCase().includes(searchTerm.toLowerCase());
 
-      if (filterType === "all") return searchMatch;
+    if (filterType === "all") return searchMatch;
 
-      if (filterType === "gmail") {
-        return (
-          searchMatch &&
-          student.email.includes("gmail")
-        );
-      }
-
-      if (filterType === "company") {
-        return (
-          searchMatch &&
-          !student.email.includes("gmail")
-        );
-      }
-
-      return searchMatch;
+    if (filterType === "gmail") {
+      return searchMatch && student.email.includes("gmail");
     }
+
+    if (filterType === "company") {
+      return searchMatch && !student.email.includes("gmail");
+    }
+
+    return searchMatch;
+  });
+
+  const totalPages = Math.ceil(filteredStudents.length / studentsPerPage);
+  const startIndex = (currentPage - 1) * studentsPerPage;
+
+  const displayedStudents = filteredStudents.slice(
+    startIndex,
+    startIndex + studentsPerPage
   );
-
-  const totalPages = Math.ceil(
-    filteredStudents.length / studentsPerPage
-  );
-
-  const startIndex =
-    (currentPage - 1) * studentsPerPage;
-
-  const displayedStudents =
-    filteredStudents.slice(
-      startIndex,
-      startIndex + studentsPerPage
-    );
 
   function handleChange(e) {
-    setForm({
+    setForm({ ...form, [e.target.name]: e.target.value });
+  }
+
+  function buildStudentPayload() {
+    return {
       ...form,
-      [e.target.name]: e.target.value,
-    });
+      course: "React",
+      gpa: 3.7,
+      status: "Active",
+    };
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
 
+    const payload = buildStudentPayload();
+
     if (editingId) {
       try {
-        if (editingId <= 10) {
-          await updateStudent(
-            editingId,
-            form
-          );
-        }
+        const updatedStudent = await updateStudent(editingId, payload);
 
         setStudents(
           students.map((student) =>
-            student.id === editingId
-              ? {
-                  ...student,
-                  ...form,
-                }
-              : student
+            student.id === editingId ? updatedStudent : student
           )
         );
 
         setEditingId(null);
-
-        setForm({
-          name: "",
-          email: "",
-        });
-
-        showNotification(
-          "Student updated successfully."
-        );
+        setForm({ name: "", email: "" });
+        showNotification("Student updated successfully.");
       } catch (error) {
-        console.error(
-          "Failed to update student:",
-          error
-        );
-
-        showNotification(
-          "Failed to update student.",
-          "error"
-        );
+        console.error("Failed to update student:", error);
+        showNotification("Failed to update student.", "error");
       }
 
       return;
     }
 
     try {
-      const createdStudent =
-        await createStudent(form);
+      const createdStudent = await createStudent(payload);
 
-      setStudents([
-        {
-          ...createdStudent,
-          ...form,
-          id: Date.now(),
-        },
-        ...students,
-      ]);
-
-      setForm({
-        name: "",
-        email: "",
-      });
-
+      setStudents([createdStudent, ...students]);
+      setForm({ name: "", email: "" });
       setCurrentPage(1);
-
-      showNotification(
-        "Student added successfully."
-      );
+      showNotification("Student added successfully.");
     } catch (error) {
-      console.error(
-        "Failed to add student:",
-        error
-      );
-
-      showNotification(
-        "Failed to add student.",
-        "error"
-      );
+      console.error("Failed to add student:", error);
+      showNotification("Failed to add student.", "error");
     }
   }
 
@@ -235,45 +165,24 @@ export default function Students() {
 
   function handleCancelEdit() {
     setEditingId(null);
-
-    setForm({
-      name: "",
-      email: "",
-    });
+    setForm({ name: "", email: "" });
   }
 
   async function handleDelete(id) {
-    const confirmDelete =
-      window.confirm(
-        "Are you sure you want to delete this student?"
-      );
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this student?"
+    );
 
     if (!confirmDelete) return;
 
     try {
-      if (id <= 10) {
-        await deleteStudent(id);
-      }
+      await deleteStudent(id);
 
-      setStudents(
-        students.filter(
-          (student) => student.id !== id
-        )
-      );
-
-      showNotification(
-        "Student deleted successfully."
-      );
+      setStudents(students.filter((student) => student.id !== id));
+      showNotification("Student deleted successfully.");
     } catch (error) {
-      console.error(
-        "Failed to delete student:",
-        error
-      );
-
-      showNotification(
-        "Failed to delete student.",
-        "error"
-      );
+      console.error("Failed to delete student:", error);
+      showNotification("Failed to delete student.", "error");
     }
   }
 
@@ -283,9 +192,7 @@ export default function Students() {
         <Navbar />
 
         <Container>
-          <Subtitle>
-            Loading students...
-          </Subtitle>
+          <Subtitle>Loading students...</Subtitle>
         </Container>
 
         <Footer />
@@ -306,14 +213,10 @@ export default function Students() {
       <Container>
         <StudentHeaderCard>
           <Header>
-            <Title>
-              Students
-            </Title>
+            <Title>Students</Title>
 
             <Subtitle>
-              Manage student records,
-              search academic data,
-              and organize student
+              Manage student records, search academic data, and organize student
               information in one place.
             </Subtitle>
           </Header>
@@ -324,10 +227,7 @@ export default function Students() {
               placeholder="Search by name or email..."
               value={searchTerm}
               onChange={(e) => {
-                setSearchTerm(
-                  e.target.value
-                );
-
+                setSearchTerm(e.target.value);
                 setCurrentPage(1);
               }}
             />
@@ -335,24 +235,13 @@ export default function Students() {
             <Select
               value={filterType}
               onChange={(e) => {
-                setFilterType(
-                  e.target.value
-                );
-
+                setFilterType(e.target.value);
                 setCurrentPage(1);
               }}
             >
-              <option value="all">
-                All Students
-              </option>
-
-              <option value="gmail">
-                Gmail Students
-              </option>
-
-              <option value="company">
-                Company Emails
-              </option>
+              <option value="all">All Students</option>
+              <option value="gmail">Gmail Students</option>
+              <option value="company">Company Emails</option>
             </Select>
           </ToolsBar>
 
@@ -377,18 +266,11 @@ export default function Students() {
 
             <FormButtons>
               <Button type="submit">
-                {editingId
-                  ? "Update"
-                  : "Add Student"}
+                {editingId ? "Update" : "Add Student"}
               </Button>
 
               {editingId && (
-                <Button
-                  type="button"
-                  onClick={
-                    handleCancelEdit
-                  }
-                >
+                <Button type="button" onClick={handleCancelEdit}>
                   Cancel
                 </Button>
               )}
@@ -397,113 +279,68 @@ export default function Students() {
         </StudentHeaderCard>
 
         <Grid>
-          {displayedStudents.map(
-            (student) => (
-              <Card
-                key={student.id}
-                onClick={() =>
-                  navigate(
-                    `/students/${student.id}`
-                  )
-                }
-                style={{
-                  cursor: "pointer",
-                }}
-              >
-                <StudentName>
-                  {student.name}
-                </StudentName>
+          {displayedStudents.map((student) => (
+            <Card
+              key={student.id}
+              onClick={() => navigate(`/students/${student.id}`)}
+              style={{ cursor: "pointer" }}
+            >
+              <StudentName>{student.name}</StudentName>
 
-                <StudentEmail>
-                  {student.email}
-                </StudentEmail>
+              <StudentEmail>{student.email}</StudentEmail>
 
-                <Actions>
-                  <ActionButton
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
+              <Actions>
+                <ActionButton
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleEdit(student);
+                  }}
+                >
+                  Edit
+                </ActionButton>
 
-                      handleEdit(
-                        student
-                      );
-                    }}
-                  >
-                    Edit
-                  </ActionButton>
-
-                  <ActionButton
-                    type="button"
-                    $danger
-                    onClick={(e) => {
-                      e.stopPropagation();
-
-                      handleDelete(
-                        student.id
-                      );
-                    }}
-                  >
-                    Delete
-                  </ActionButton>
-                </Actions>
-              </Card>
-            )
-          )}
+                <ActionButton
+                  type="button"
+                  $danger
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete(student.id);
+                  }}
+                >
+                  Delete
+                </ActionButton>
+              </Actions>
+            </Card>
+          ))}
         </Grid>
 
         <Pagination>
           <PageButton
             $wide
             type="button"
-            onClick={() =>
-              setCurrentPage(
-                (page) => page - 1
-              )
-            }
-            disabled={
-              currentPage === 1
-            }
+            onClick={() => setCurrentPage((page) => page - 1)}
+            disabled={currentPage === 1}
           >
             Previous
           </PageButton>
 
-          {Array.from(
-            {
-              length:
-                totalPages || 1,
-            },
-            (_, index) => (
-              <PageButton
-                key={index + 1}
-                type="button"
-                $active={
-                  currentPage ===
-                  index + 1
-                }
-                onClick={() =>
-                  setCurrentPage(
-                    index + 1
-                  )
-                }
-              >
-                {index + 1}
-              </PageButton>
-            )
-          )}
+          {Array.from({ length: totalPages || 1 }, (_, index) => (
+            <PageButton
+              key={index + 1}
+              type="button"
+              $active={currentPage === index + 1}
+              onClick={() => setCurrentPage(index + 1)}
+            >
+              {index + 1}
+            </PageButton>
+          ))}
 
           <PageButton
             $wide
             type="button"
-            onClick={() =>
-              setCurrentPage(
-                (page) => page + 1
-              )
-            }
-            disabled={
-              currentPage ===
-                totalPages ||
-              totalPages === 0
-            }
+            onClick={() => setCurrentPage((page) => page + 1)}
+            disabled={currentPage === totalPages || totalPages === 0}
           >
             Next
           </PageButton>

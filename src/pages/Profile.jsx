@@ -6,6 +6,7 @@ import Button from "../ui/Button";
 import Notification from "../components/Notification";
 import useNotification from "../hooks/useNotification";
 import { useAuth } from "../context/AuthContext";
+import { updateProfile } from "../api/authService";
 
 import { Page, Container, Header, Title, Subtitle, Grid } from "../ui/PageLayout";
 import { StudentHeaderCard } from "../ui/StudentUI";
@@ -24,16 +25,26 @@ export default function Profile() {
   const { user } = useAuth();
   const { notification, showNotification } = useNotification();
 
-  const [profile, setProfile] = useState({
-    name: user?.name || "User",
-    email: user?.email || "No email available",
-    role: "Academic Admin",
-    department: "Student Affairs",
-    phone: "+970 000 000 000",
-    status: "Active",
-  });
+  const storedUser =
+    JSON.parse(localStorage.getItem("user")) ||
+    JSON.parse(localStorage.getItem("edutrack-user"));
 
-  const [profileImage, setProfileImage] = useState("");
+  const savedProfile = JSON.parse(localStorage.getItem("profileInfo"));
+
+  const [profile, setProfile] = useState(
+    savedProfile || {
+      name: storedUser?.name || user?.name || "User",
+      email: storedUser?.email || user?.email || "No email available",
+      role: "Academic Admin",
+      department: "Student Affairs",
+      phone: "+970 000 000 000",
+      status: "Active",
+    }
+  );
+
+  const [profileImage, setProfileImage] = useState(
+    localStorage.getItem("profileImage") || ""
+  );
 
   function handleChange(e) {
     setProfile({
@@ -47,15 +58,64 @@ export default function Profile() {
 
     if (!file) return;
 
-    const imageUrl = URL.createObjectURL(file);
-    setProfileImage(imageUrl);
+    const reader = new FileReader();
 
-    showNotification("Profile image uploaded successfully.");
+    reader.onloadend = () => {
+      localStorage.setItem("profileImage", reader.result);
+      setProfileImage(reader.result);
+      showNotification("Profile image uploaded successfully.");
+      window.location.reload();
+    };
+
+    reader.readAsDataURL(file);
   }
 
-  function handleUpdate(e) {
+  async function handleUpdate(e) {
     e.preventDefault();
-    showNotification("Profile updated successfully.");
+
+    const currentUser =
+      JSON.parse(localStorage.getItem("user")) ||
+      JSON.parse(localStorage.getItem("edutrack-user"));
+
+    const currentEmail =
+      currentUser?.email ||
+      savedProfile?.email ||
+      user?.email ||
+      profile.email;
+
+    if (!currentEmail || currentEmail === "No email available") {
+      showNotification("User email not found. Please login again.", "error");
+      return;
+    }
+
+    try {
+      const result = await updateProfile({
+        currentEmail,
+        name: profile.name,
+        email: profile.email,
+      });
+
+      const updatedProfile = {
+        ...profile,
+        name: result.user.name,
+        email: result.user.email,
+      };
+
+      localStorage.setItem("profileInfo", JSON.stringify(updatedProfile));
+      localStorage.setItem("user", JSON.stringify(result.user));
+      localStorage.setItem("edutrack-user", JSON.stringify(result.user));
+
+      setProfile(updatedProfile);
+
+      showNotification("Profile updated successfully.");
+    } catch (error) {
+      console.error("Failed to update profile:", error);
+
+      const message =
+        error.response?.data?.message || "Failed to update profile.";
+
+      showNotification(message, "error");
+    }
   }
 
   return (
@@ -150,6 +210,11 @@ export default function Profile() {
             <Row>
               <Label>Department</Label>
               <Value>{profile.department}</Value>
+            </Row>
+
+            <Row>
+              <Label>Phone</Label>
+              <Value>{profile.phone}</Value>
             </Row>
           </InfoCard>
 

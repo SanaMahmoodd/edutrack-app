@@ -6,6 +6,7 @@ import * as yup from "yup";
 
 import AuthInput from "../components/uthInput";
 import Button from "../ui/Button";
+
 import {
   AuthPage,
   AuthCard,
@@ -19,14 +20,17 @@ import hero from "../assets/hero.png";
 
 const schema = yup.object({
   name: yup.string().required("Full name is required"),
+
   email: yup
     .string()
     .email("Enter a valid email address")
     .required("Email is required"),
+
   password: yup
     .string()
     .min(6, "Password must be at least 6 characters")
     .required("Password is required"),
+
   confirmPassword: yup
     .string()
     .oneOf([yup.ref("password")], "Passwords do not match")
@@ -41,13 +45,13 @@ export default function SignUp() {
     register,
     handleSubmit,
     setError,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm({
     resolver: yupResolver(schema),
   });
 
-  function onSubmit(data) {
-    const result = signup(
+  async function onSubmit(data) {
+    const result = await signup(
       data.name,
       data.email,
       data.password,
@@ -55,7 +59,10 @@ export default function SignUp() {
     );
 
     if (!result.success) {
-      setError("email", { message: result.message });
+      setError("email", {
+        message: result.message,
+      });
+
       return;
     }
 
@@ -67,6 +74,7 @@ export default function SignUp() {
       <AuthCard>
         <AuthLeft>
           <AuthTitle>Create Account</AuthTitle>
+
           <AuthSubtitle>
             Join EduTrack and start your academic journey
           </AuthSubtitle>
@@ -105,12 +113,16 @@ export default function SignUp() {
 
             <label className="agree">
               <input type="checkbox" required defaultChecked />
+
               <span>
-                I agree to the <b>Terms of Service</b> and <b>Privacy Policy</b>
+                I agree to the <b>Terms of Service</b> and{" "}
+                <b>Privacy Policy</b>
               </span>
             </label>
 
-            <Button type="submit">Sign Up</Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Creating account..." : "Sign Up"}
+            </Button>
 
             <div className="or">
               <span></span>
@@ -135,6 +147,7 @@ export default function SignUp() {
           <span className="spark spark1"></span>
           <span className="spark spark2"></span>
           <span className="spark spark3"></span>
+
           <span className="line line1"></span>
           <span className="line line2"></span>
 
@@ -143,6 +156,7 @@ export default function SignUp() {
           </div>
 
           <h2>Smart. Simple. Academic.</h2>
+
           <p className="right-text">
             Manage students, courses, and progress <br />
             all in one beautiful platform.

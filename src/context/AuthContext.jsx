@@ -1,21 +1,20 @@
 import { createContext, useContext, useState } from "react";
+import axiosClient from "../api/axiosClient";
 
 const AuthContext = createContext(null);
 
 function getSavedUser() {
-  const savedUser = localStorage.getItem("edutrack-user");
-  return savedUser ? JSON.parse(savedUser) : null;
-}
+  const savedUser =
+    localStorage.getItem("edutrack-user") ||
+    localStorage.getItem("user");
 
-function getUsers() {
-  const users = localStorage.getItem("edutrack-users");
-  return users ? JSON.parse(users) : [];
+  return savedUser ? JSON.parse(savedUser) : null;
 }
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(getSavedUser);
 
-  function signup(name, email, password, confirmPassword) {
+  async function signup(name, email, password, confirmPassword) {
     if (!name || !email || !password || !confirmPassword) {
       return { success: false, message: "Please fill all fields" };
     }
@@ -24,59 +23,72 @@ export function AuthProvider({ children }) {
       return { success: false, message: "Passwords do not match" };
     }
 
-    const users = getUsers();
+    try {
+      const response = await axiosClient.post("/auth/register", {
+        name,
+        email,
+        password,
+      });
 
-    const userExists = users.find((u) => u.email === email);
-    if (userExists) {
-      return { success: false, message: "This email already has an account" };
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("edutrack-user", JSON.stringify(response.data.user));
+      localStorage.setItem("user", JSON.stringify(response.data.user));
+
+      setUser(response.data.user);
+
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || "Signup failed",
+      };
     }
-
-    const newUser = { name, email, password };
-
-    const updatedUsers = [...users, newUser];
-    localStorage.setItem("edutrack-users", JSON.stringify(updatedUsers));
-
-    const loggedUser = { name, email };
-    localStorage.setItem("edutrack-user", JSON.stringify(loggedUser));
-    setUser(loggedUser);
-
-    return { success: true };
   }
 
-  function login(email, password) {
+  async function login(email, password) {
     if (!email || !password) {
       return { success: false, message: "Please fill all fields" };
     }
 
-    const users = getUsers();
+    try {
+      const response = await axiosClient.post("/auth/login", {
+        email,
+        password,
+      });
 
-    const foundUser = users.find(
-      (u) => u.email === email && u.password === password
-    );
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("edutrack-user", JSON.stringify(response.data.user));
+      localStorage.setItem("user", JSON.stringify(response.data.user));
 
-    if (!foundUser) {
-      return { success: false, message: "Invalid email or password" };
+      setUser(response.data.user);
+
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || "Invalid email or password",
+      };
     }
-
-    const loggedUser = {
-      name: foundUser.name,
-      email: foundUser.email,
-    };
-
-    localStorage.setItem("edutrack-user", JSON.stringify(loggedUser));
-    setUser(loggedUser);
-
-    return { success: true };
   }
 
   function logout() {
+    localStorage.removeItem("token");
     localStorage.removeItem("edutrack-user");
+    localStorage.removeItem("user");
+    localStorage.removeItem("profileInfo");
+
     setUser(null);
   }
 
   return (
     <AuthContext.Provider
-      value={{ user, signup, login, logout, isAuthenticated: Boolean(user) }}
+      value={{
+        user,
+        signup,
+        login,
+        logout,
+        isAuthenticated: Boolean(user),
+      }}
     >
       {children}
     </AuthContext.Provider>

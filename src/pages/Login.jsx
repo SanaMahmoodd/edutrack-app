@@ -6,6 +6,7 @@ import * as yup from "yup";
 
 import AuthInput from "../components/uthInput";
 import Button from "../ui/Button";
+
 import {
   AuthPage,
   AuthCard,
@@ -22,6 +23,7 @@ const schema = yup.object({
     .string()
     .email("Enter a valid email")
     .required("Email is required"),
+
   password: yup
     .string()
     .min(6, "Password must be at least 6 characters")
@@ -36,16 +38,19 @@ export default function Login() {
     register,
     handleSubmit,
     setError,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm({
     resolver: yupResolver(schema),
   });
 
-  function onSubmit(data) {
-    const result = login(data.email, data.password);
+  async function onSubmit(data) {
+    const result = await login(data.email, data.password);
 
     if (!result.success) {
-      setError("email", { message: result.message });
+      setError("email", {
+        message: result.message,
+      });
+
       return;
     }
 
@@ -57,6 +62,7 @@ export default function Login() {
       <AuthCard>
         <AuthLeft $login>
           <AuthTitle>Welcome Back</AuthTitle>
+
           <AuthSubtitle $login>
             Login to continue managing your academic dashboard
           </AuthSubtitle>
@@ -78,7 +84,9 @@ export default function Login() {
               error={errors.password}
             />
 
-            <Button type="submit">Login</Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Logging in..." : "Login"}
+            </Button>
 
             <div className="or">
               <span></span>
@@ -103,6 +111,7 @@ export default function Login() {
           <span className="spark spark1"></span>
           <span className="spark spark2"></span>
           <span className="spark spark3"></span>
+
           <span className="line line1"></span>
           <span className="line line2"></span>
 
@@ -111,6 +120,7 @@ export default function Login() {
           </div>
 
           <h2>Smart. Simple. Academic.</h2>
+
           <p className="right-text">
             Manage students, courses, and progress <br />
             all in one beautiful platform.
