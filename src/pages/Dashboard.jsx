@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
@@ -8,11 +9,16 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
+  LineChart,
+  Line,
 } from "recharts";
 
 import Button from "../ui/Button";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+
+import { getStudents } from "../api/studentService";
+import { getCourses } from "../api/courseService";
 
 import {
   DashboardPage,
@@ -40,25 +46,81 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
+  const [students, setStudents] = useState([]);
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadDashboardData() {
+      try {
+        const studentsData = await getStudents();
+        const coursesData = await getCourses();
+
+        setStudents(studentsData);
+        setCourses(coursesData);
+      } catch (error) {
+        console.error("Failed to load dashboard data:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadDashboardData();
+  }, []);
+
+  const averageGpa =
+    students.length > 0
+      ? (
+          students.reduce((sum, student) => sum + Number(student.gpa || 0), 0) /
+          students.length
+        ).toFixed(1)
+      : "0.0";
+
+  const courseData = courses.map((course) => ({
+    course: course.name,
+    students: course.students,
+  }));
+
+  const performanceData = students.map((student) => ({
+    name: student.name.split(" ")[0],
+    gpa: Number(student.gpa || 0),
+  }));
+
   const stats = [
-    { icon: "🎓", value: "10", label: "Registered Students" },
-    { icon: "📚", value: "4", label: "Active Courses" },
-    { icon: "📈", value: "86%", label: "Average Performance" },
-    { icon: "🟢", value: "Live", label: "API Connection" },
+    {
+      icon: "🎓",
+      value: students.length,
+      label: "Registered Students",
+    },
+    {
+      icon: "📚",
+      value: courses.length,
+      label: "Active Courses",
+    },
+    {
+      icon: "📈",
+      value: averageGpa,
+      label: "Average GPA",
+    },
+    {
+      icon: "🟢",
+      value: "Live",
+      label: "API Connection",
+    },
   ];
 
   const activities = [
     {
-      text: "New student record was created",
-      time: "Today",
-    },
-    {
-      text: "Student profile information was updated",
-      time: "Today",
-    },
-    {
-      text: "External API connection checked successfully",
+      text: "Flask backend API connected successfully",
       time: "Live",
+    },
+    {
+      text: "Student records loaded from database",
+      time: "Updated",
+    },
+    {
+      text: "Course data synchronized with backend",
+      time: "Active",
     },
     {
       text: "Authentication and protected routes are active",
@@ -72,7 +134,7 @@ export default function Dashboard() {
       time: "Pending",
     },
     {
-      text: "Check inactive students",
+      text: "Check course enrollment",
       time: "This week",
     },
     {
@@ -80,17 +142,30 @@ export default function Dashboard() {
       time: "Optional",
     },
     {
-      text: "Update course information",
+      text: "Update academic performance data",
       time: "Next step",
     },
   ];
 
-  const courseData = [
-    { course: "React", students: 28 },
-    { course: "Python", students: 22 },
-    { course: "Flask", students: 18 },
-    { course: "UI/UX", students: 15 },
-  ];
+  if (loading) {
+    return (
+      <DashboardPage>
+        <Navbar />
+
+        <DashboardContainer>
+          <Hero>
+            <HeroTitle>Loading Dashboard...</HeroTitle>
+            <HeroText>
+              Please wait while the system loads dashboard analytics from the
+              backend API.
+            </HeroText>
+          </Hero>
+        </DashboardContainer>
+
+        <Footer />
+      </DashboardPage>
+    );
+  }
 
   return (
     <DashboardPage>
@@ -98,23 +173,16 @@ export default function Dashboard() {
 
       <DashboardContainer>
         <Hero>
-          <HeroTitle>
-            Student Management Dashboard
-          </HeroTitle>
+          <HeroTitle>Student Management Dashboard</HeroTitle>
 
           <HeroText>
-            Welcome back, {user?.name || "User"}.
-            Monitor students, manage academic
-            records, review system activity,
-            and organize administrative tasks
-            from one modern dashboard.
+            Welcome back, {user?.name || "User"}. Monitor students, manage
+            academic records, review system activity, and track real-time data
+            from your Flask backend.
           </HeroText>
 
           <ActionRow>
-            <Button
-              type="button"
-              onClick={() => navigate("/students")}
-            >
+            <Button type="button" onClick={() => navigate("/students")}>
               Manage Students
             </Button>
           </ActionRow>
@@ -124,9 +192,7 @@ export default function Dashboard() {
           {stats.map((stat) => (
             <StatCard key={stat.label}>
               <StatIcon>{stat.icon}</StatIcon>
-
               <StatValue>{stat.value}</StatValue>
-
               <StatLabel>{stat.label}</StatLabel>
             </StatCard>
           ))}
@@ -134,49 +200,29 @@ export default function Dashboard() {
 
         <ContentGrid>
           <Panel>
-            <PanelTitle>
-              Recent System Activity
-            </PanelTitle>
+            <PanelTitle>Recent System Activity</PanelTitle>
 
             {activities.map((item) => (
               <ActivityItem key={item.text}>
-                <ActivityText>
-                  {item.text}
-                </ActivityText>
-
-                <ActivityTime>
-                  {item.time}
-                </ActivityTime>
+                <ActivityText>{item.text}</ActivityText>
+                <ActivityTime>{item.time}</ActivityTime>
               </ActivityItem>
             ))}
           </Panel>
 
           <Panel>
-            <PanelTitle>
-              Students by Course
-            </PanelTitle>
+            <PanelTitle>Students by Course</PanelTitle>
 
-            <div
-              style={{
-                width: "100%",
-                height: "260px",
-                marginTop: "18px",
-              }}
-            >
+            <div style={{ width: "100%", height: "260px", marginTop: "18px" }}>
               <ResponsiveContainer>
                 <BarChart data={courseData}>
-                  <XAxis
-                    dataKey="course"
-                    stroke="#9fb0c4"
-                  />
-
+                  <XAxis dataKey="course" stroke="#9fb0c4" />
                   <YAxis stroke="#9fb0c4" />
 
                   <Tooltip
                     contentStyle={{
                       background: "#06101e",
-                      border:
-                        "1px solid rgba(231, 189, 105, 0.22)",
+                      border: "1px solid rgba(231, 189, 105, 0.22)",
                       borderRadius: "10px",
                       color: "#fff",
                     }}
@@ -195,65 +241,74 @@ export default function Dashboard() {
 
         <ContentGrid>
           <Panel>
-            <PanelTitle>
-              Administrative Tasks
-            </PanelTitle>
+            <PanelTitle>Student GPA Performance</PanelTitle>
 
-            {tasks.map((task) => (
-              <ActivityItem key={task.text}>
-                <ActivityText>
-                  {task.text}
-                </ActivityText>
+            <div style={{ width: "100%", height: "260px", marginTop: "18px" }}>
+              <ResponsiveContainer>
+                <LineChart data={performanceData}>
+                  <XAxis dataKey="name" stroke="#9fb0c4" />
+                  <YAxis stroke="#9fb0c4" domain={[0, 4]} />
 
-                <ActivityTime>
-                  {task.time}
-                </ActivityTime>
-              </ActivityItem>
-            ))}
+                  <Tooltip
+                    contentStyle={{
+                      background: "#06101e",
+                      border: "1px solid rgba(231, 189, 105, 0.22)",
+                      borderRadius: "10px",
+                      color: "#fff",
+                    }}
+                  />
+
+                  <Line
+                    type="monotone"
+                    dataKey="gpa"
+                    stroke="#e7bd69"
+                    strokeWidth={3}
+                    dot={{ r: 5 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
           </Panel>
 
           <Panel>
-            <PanelTitle>
-              System Status
-            </PanelTitle>
+            <PanelTitle>System Status</PanelTitle>
 
-            <StatLabel>
-              Authentication System
-            </StatLabel>
-
+            <StatLabel>Authentication System</StatLabel>
             <ProgressTrack>
               <ProgressFill $value={100} />
             </ProgressTrack>
 
-            <StatLabel
-              style={{ marginTop: "18px" }}
-            >
-              API Integration
-            </StatLabel>
+            <StatLabel style={{ marginTop: "18px" }}>API Integration</StatLabel>
+            <ProgressTrack>
+              <ProgressFill $value={100} />
+            </ProgressTrack>
 
+            <StatLabel style={{ marginTop: "18px" }}>
+              Database Synchronization
+            </StatLabel>
             <ProgressTrack>
               <ProgressFill $value={95} />
             </ProgressTrack>
 
-            <StatLabel
-              style={{ marginTop: "18px" }}
-            >
-              Database Synchronization
-            </StatLabel>
-
-            <ProgressTrack>
-              <ProgressFill $value={88} />
-            </ProgressTrack>
-
-            <StatLabel
-              style={{ marginTop: "18px" }}
-            >
+            <StatLabel style={{ marginTop: "18px" }}>
               Deployment Readiness
             </StatLabel>
-
             <ProgressTrack>
               <ProgressFill $value={100} />
             </ProgressTrack>
+          </Panel>
+        </ContentGrid>
+
+        <ContentGrid>
+          <Panel>
+            <PanelTitle>Administrative Tasks</PanelTitle>
+
+            {tasks.map((task) => (
+              <ActivityItem key={task.text}>
+                <ActivityText>{task.text}</ActivityText>
+                <ActivityTime>{task.time}</ActivityTime>
+              </ActivityItem>
+            ))}
           </Panel>
         </ContentGrid>
       </DashboardContainer>

@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import Notification from "../components/Notification";
+import ConfirmModal from "../components/ConfirmModal";
+
 import useNotification from "../hooks/useNotification";
 
 import Button from "../ui/Button";
@@ -40,6 +42,8 @@ export default function Courses() {
   const [courseName, setCourseName] = useState("");
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const [deleteId, setDeleteId] = useState(null);
 
   const { notification, showNotification } = useNotification();
 
@@ -120,21 +124,27 @@ export default function Courses() {
     setCourseName("");
   }
 
-  async function handleDelete(id) {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this course?"
-    );
+  function openDeleteModal(id) {
+    setDeleteId(id);
+  }
 
-    if (!confirmDelete) return;
+  function closeDeleteModal() {
+    setDeleteId(null);
+  }
+
+  async function confirmDeleteCourse() {
+    if (!deleteId) return;
 
     try {
-      await deleteCourse(id);
+      await deleteCourse(deleteId);
 
-      setCourses(courses.filter((course) => course.id !== id));
+      setCourses(courses.filter((course) => course.id !== deleteId));
       showNotification("Course deleted successfully.");
     } catch (error) {
       console.error("Failed to delete course:", error);
       showNotification("Failed to delete course.", "error");
+    } finally {
+      setDeleteId(null);
     }
   }
 
@@ -162,10 +172,21 @@ export default function Courses() {
         type={notification.type}
       />
 
+      <ConfirmModal
+        show={Boolean(deleteId)}
+        title="Delete Course"
+        message="Are you sure you want to delete this course? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={confirmDeleteCourse}
+        onCancel={closeDeleteModal}
+      />
+
       <Container>
         <StudentHeaderCard>
           <Header>
             <Title>Courses</Title>
+
             <Subtitle>
               Manage course records, update course information, and track
               students enrolled in each course.
@@ -213,14 +234,17 @@ export default function Courses() {
               </StudentEmail>
 
               <Actions>
-                <ActionButton type="button" onClick={() => handleEdit(course)}>
+                <ActionButton
+                  type="button"
+                  onClick={() => handleEdit(course)}
+                >
                   Edit
                 </ActionButton>
 
                 <ActionButton
                   type="button"
                   $danger
-                  onClick={() => handleDelete(course.id)}
+                  onClick={() => openDeleteModal(course.id)}
                 >
                   Delete
                 </ActionButton>

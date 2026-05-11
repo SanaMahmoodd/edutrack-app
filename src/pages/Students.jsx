@@ -7,6 +7,7 @@ import Card from "../ui/Card";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import Notification from "../components/Notification";
+import ConfirmModal from "../components/ConfirmModal";
 
 import useNotification from "../hooks/useNotification";
 
@@ -50,6 +51,8 @@ export default function Students() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
+
+  const [deleteId, setDeleteId] = useState(null);
 
   const navigate = useNavigate();
   const studentsPerPage = 6;
@@ -168,21 +171,27 @@ export default function Students() {
     setForm({ name: "", email: "" });
   }
 
-  async function handleDelete(id) {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this student?"
-    );
+  function openDeleteModal(id) {
+    setDeleteId(id);
+  }
 
-    if (!confirmDelete) return;
+  function closeDeleteModal() {
+    setDeleteId(null);
+  }
+
+  async function confirmDeleteStudent() {
+    if (!deleteId) return;
 
     try {
-      await deleteStudent(id);
+      await deleteStudent(deleteId);
 
-      setStudents(students.filter((student) => student.id !== id));
+      setStudents(students.filter((student) => student.id !== deleteId));
       showNotification("Student deleted successfully.");
     } catch (error) {
       console.error("Failed to delete student:", error);
       showNotification("Failed to delete student.", "error");
+    } finally {
+      setDeleteId(null);
     }
   }
 
@@ -208,6 +217,16 @@ export default function Students() {
         show={notification.show}
         message={notification.message}
         type={notification.type}
+      />
+
+      <ConfirmModal
+        show={Boolean(deleteId)}
+        title="Delete Student"
+        message="Are you sure you want to delete this student? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={confirmDeleteStudent}
+        onCancel={closeDeleteModal}
       />
 
       <Container>
@@ -305,7 +324,7 @@ export default function Students() {
                   $danger
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleDelete(student.id);
+                    openDeleteModal(student.id);
                   }}
                 >
                   Delete
