@@ -248,3 +248,67 @@ export const IllustrationText = styled.p`
   line-height: 1.7;
   font-size: 13px;
 `;
+
+export const FullWidthSection = styled.section`
+  margin-top: 28px;
+`;
+
+export const ChartWrapper = styled.div`
+  width: 100%;
+  height: 260px;
+  margin-top: 18px;
+`;
+
+export const ChartTooltipStyle = {
+  background: "#06101e",
+  border: "1px solid rgba(231, 189, 105, 0.22)",
+  borderRadius: "10px",
+  color: "#fff",
+};
+
+export const FloatingGlow = styled.div`
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  &::before {
+    content: "";
+    position: absolute;
+    left: 8%;
+    bottom: 14%;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: rgba(231, 189, 105, 0.08);
+    filter: blur(50px);
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    right: 12%;
+    top: 16%;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    background: rgba(52, 115, 190, 0.1);
+    filter: blur(60px);
+  }
+`;
+
+export const MiniBadge = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 14px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+
+  color: ${({ theme }) => theme.colors.goldLight};
+
+  border: 1px solid ${({ theme }) => theme.colors.border};
+
+  background: rgba(255, 255, 255, 0.04);
+`;

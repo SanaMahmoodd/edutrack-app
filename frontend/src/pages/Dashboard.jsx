@@ -13,7 +13,14 @@ import {
   Line,
 } from "recharts";
 
-import Button from "../ui/Button";
+import {
+  GraduationCap,
+  BookOpen,
+  LineChart as LineChartIcon,
+  Wifi,
+} from "lucide-react";
+
+import Button from "../ui/ButtonUI";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
@@ -40,6 +47,7 @@ import {
   ActivityTime,
   ProgressTrack,
   ProgressFill,
+  FullWidthSection,
 } from "../ui/DashboardUI";
 
 export default function Dashboard() {
@@ -71,8 +79,10 @@ export default function Dashboard() {
   const averageGpa =
     students.length > 0
       ? (
-          students.reduce((sum, student) => sum + Number(student.gpa || 0), 0) /
-          students.length
+          students.reduce(
+            (sum, student) => sum + Number(student.gpa || 0),
+            0
+          ) / students.length
         ).toFixed(1)
       : "0.0";
 
@@ -88,22 +98,25 @@ export default function Dashboard() {
 
   const stats = [
     {
-      icon: "🎓",
+      icon: <GraduationCap size={22} />,
       value: students.length,
       label: "Registered Students",
     },
+
     {
-      icon: "📚",
+      icon: <BookOpen size={22} />,
       value: courses.length,
       label: "Active Courses",
     },
+
     {
-      icon: "📈",
+      icon: <LineChartIcon size={22} />,
       value: averageGpa,
       label: "Average GPA",
     },
+
     {
-      icon: "🟢",
+      icon: <Wifi size={22} />,
       value: "Live",
       label: "API Connection",
     },
@@ -114,14 +127,17 @@ export default function Dashboard() {
       text: "Flask backend API connected successfully",
       time: "Live",
     },
+
     {
       text: "Student records loaded from database",
       time: "Updated",
     },
+
     {
       text: "Course data synchronized with backend",
       time: "Active",
     },
+
     {
       text: "Authentication and protected routes are active",
       time: "Secure",
@@ -133,14 +149,17 @@ export default function Dashboard() {
       text: "Review student records",
       time: "Pending",
     },
+
     {
       text: "Check course enrollment",
       time: "This week",
     },
+
     {
       text: "Export student report",
       time: "Optional",
     },
+
     {
       text: "Update academic performance data",
       time: "Next step",
@@ -155,6 +174,7 @@ export default function Dashboard() {
         <DashboardContainer>
           <Hero>
             <HeroTitle>Loading Dashboard...</HeroTitle>
+
             <HeroText>
               Please wait while the system loads dashboard analytics from the
               backend API.
@@ -192,7 +212,9 @@ export default function Dashboard() {
           {stats.map((stat) => (
             <StatCard key={stat.label}>
               <StatIcon>{stat.icon}</StatIcon>
+
               <StatValue>{stat.value}</StatValue>
+
               <StatLabel>{stat.label}</StatLabel>
             </StatCard>
           ))}
@@ -205,6 +227,7 @@ export default function Dashboard() {
             {activities.map((item) => (
               <ActivityItem key={item.text}>
                 <ActivityText>{item.text}</ActivityText>
+
                 <ActivityTime>{item.time}</ActivityTime>
               </ActivityItem>
             ))}
@@ -213,16 +236,24 @@ export default function Dashboard() {
           <Panel>
             <PanelTitle>Students by Course</PanelTitle>
 
-            <div style={{ width: "100%", height: "260px", marginTop: "18px" }}>
+            <div
+              style={{
+                width: "100%",
+                height: "260px",
+                marginTop: "18px",
+              }}
+            >
               <ResponsiveContainer>
                 <BarChart data={courseData}>
                   <XAxis dataKey="course" stroke="#9fb0c4" />
+
                   <YAxis stroke="#9fb0c4" />
 
                   <Tooltip
                     contentStyle={{
                       background: "#06101e",
-                      border: "1px solid rgba(231, 189, 105, 0.22)",
+                      border:
+                        "1px solid rgba(231, 189, 105, 0.22)",
                       borderRadius: "10px",
                       color: "#fff",
                     }}
@@ -243,16 +274,24 @@ export default function Dashboard() {
           <Panel>
             <PanelTitle>Student GPA Performance</PanelTitle>
 
-            <div style={{ width: "100%", height: "260px", marginTop: "18px" }}>
+            <div
+              style={{
+                width: "100%",
+                height: "260px",
+                marginTop: "18px",
+              }}
+            >
               <ResponsiveContainer>
                 <LineChart data={performanceData}>
                   <XAxis dataKey="name" stroke="#9fb0c4" />
+
                   <YAxis stroke="#9fb0c4" domain={[0, 4]} />
 
                   <Tooltip
                     contentStyle={{
                       background: "#06101e",
-                      border: "1px solid rgba(231, 189, 105, 0.22)",
+                      border:
+                        "1px solid rgba(231, 189, 105, 0.22)",
                       borderRadius: "10px",
                       color: "#fff",
                     }}
@@ -274,11 +313,15 @@ export default function Dashboard() {
             <PanelTitle>System Status</PanelTitle>
 
             <StatLabel>Authentication System</StatLabel>
+
             <ProgressTrack>
               <ProgressFill $value={100} />
             </ProgressTrack>
 
-            <StatLabel style={{ marginTop: "18px" }}>API Integration</StatLabel>
+            <StatLabel style={{ marginTop: "18px" }}>
+              API Integration
+            </StatLabel>
+
             <ProgressTrack>
               <ProgressFill $value={100} />
             </ProgressTrack>
@@ -286,6 +329,7 @@ export default function Dashboard() {
             <StatLabel style={{ marginTop: "18px" }}>
               Database Synchronization
             </StatLabel>
+
             <ProgressTrack>
               <ProgressFill $value={95} />
             </ProgressTrack>
@@ -293,24 +337,26 @@ export default function Dashboard() {
             <StatLabel style={{ marginTop: "18px" }}>
               Deployment Readiness
             </StatLabel>
+
             <ProgressTrack>
               <ProgressFill $value={100} />
             </ProgressTrack>
           </Panel>
         </ContentGrid>
 
-        <ContentGrid>
+        <FullWidthSection>
           <Panel>
             <PanelTitle>Administrative Tasks</PanelTitle>
 
             {tasks.map((task) => (
               <ActivityItem key={task.text}>
                 <ActivityText>{task.text}</ActivityText>
+
                 <ActivityTime>{task.time}</ActivityTime>
               </ActivityItem>
             ))}
           </Panel>
-        </ContentGrid>
+        </FullWidthSection>
       </DashboardContainer>
 
       <Footer />

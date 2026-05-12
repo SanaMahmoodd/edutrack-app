@@ -4,8 +4,8 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
-import AuthInput from "../components/uthInput";
-import Button from "../ui/Button";
+import AuthInput from "../components/AuthInput";
+import Button from "../ui/ButtonUI";
 
 import {
   AuthPage,
@@ -19,20 +19,27 @@ import "../styles/Auth.css";
 import hero from "../assets/hero.png";
 
 const schema = yup.object({
+  name: yup.string().required("Full name is required"),
+
   email: yup
     .string()
-    .email("Enter a valid email")
+    .email("Enter a valid email address")
     .required("Email is required"),
 
   password: yup
     .string()
     .min(6, "Password must be at least 6 characters")
     .required("Password is required"),
+
+  confirmPassword: yup
+    .string()
+    .oneOf([yup.ref("password")], "Passwords do not match")
+    .required("Confirm password is required"),
 });
 
-export default function Login() {
+export default function SignUp() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { signup } = useAuth();
 
   const {
     register,
@@ -44,7 +51,12 @@ export default function Login() {
   });
 
   async function onSubmit(data) {
-    const result = await login(data.email, data.password);
+    const result = await signup(
+      data.name,
+      data.email,
+      data.password,
+      data.confirmPassword
+    );
 
     if (!result.success) {
       setError("email", {
@@ -60,14 +72,21 @@ export default function Login() {
   return (
     <AuthPage>
       <AuthCard>
-        <AuthLeft $login>
-          <AuthTitle>Welcome Back</AuthTitle>
+        <AuthLeft>
+          <AuthTitle>Create Account</AuthTitle>
 
-          <AuthSubtitle $login>
-            Login to continue managing your academic dashboard
+          <AuthSubtitle>
+            Join EduTrack and start your academic journey
           </AuthSubtitle>
 
           <form onSubmit={handleSubmit(onSubmit)}>
+            <AuthInput
+              icon="♡"
+              placeholder="Full Name"
+              register={register("name")}
+              error={errors.name}
+            />
+
             <AuthInput
               icon="✉"
               type="email"
@@ -84,8 +103,25 @@ export default function Login() {
               error={errors.password}
             />
 
+            <AuthInput
+              icon="⌕"
+              type="password"
+              placeholder="Confirm Password"
+              register={register("confirmPassword")}
+              error={errors.confirmPassword}
+            />
+
+            <label className="agree">
+              <input type="checkbox" required defaultChecked />
+
+              <span>
+                I agree to the <b>Terms of Service</b> and{" "}
+                <b>Privacy Policy</b>
+              </span>
+            </label>
+
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Logging in..." : "Login"}
+              {isSubmitting ? "Creating account..." : "Sign Up"}
             </Button>
 
             <div className="or">
@@ -95,11 +131,11 @@ export default function Login() {
             </div>
 
             <button
-              type="button"
               className="google-btn"
-              onClick={() => navigate("/signup")}
+              type="button"
+              onClick={() => navigate("/login")}
             >
-              Create new account
+              Already have an account? Login
             </button>
           </form>
         </AuthLeft>

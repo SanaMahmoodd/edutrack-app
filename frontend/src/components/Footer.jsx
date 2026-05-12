@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import hero from "../assets/hero.png";
 
 import {
   FaGithub,
@@ -47,8 +48,7 @@ export default function Footer() {
       <FooterTop>
         <FooterBrand>
           <BrandRow>
-            <BrandIcon>✦</BrandIcon>
-
+            <BrandIcon src={hero} alt="EduTrack Logo"/>
             <BrandName>
               EduTrack
             </BrandName>

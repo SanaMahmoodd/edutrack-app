@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
-import Button from "../ui/Button";
+import Button from "../ui/ButtonUI";
 import { getStudents } from "../api/studentService";
 
 import {

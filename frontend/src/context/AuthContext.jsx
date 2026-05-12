@@ -75,7 +75,6 @@ export function AuthProvider({ children }) {
     localStorage.removeItem("token");
     localStorage.removeItem("edutrack-user");
     localStorage.removeItem("user");
-    localStorage.removeItem("profileInfo");
 
     setUser(null);
   }

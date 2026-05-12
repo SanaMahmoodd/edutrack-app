@@ -32,19 +32,26 @@ export const BrandRow = styled.div`
   margin-bottom: 12px;
 `;
 
-export const BrandIcon = styled.div`
-  width: 42px;
-  height: 42px;
-  display: grid;
-  place-items: center;
-  border-radius: 14px;
-  color: #10141c;
-  background: linear-gradient(
-    135deg,
-    ${({ theme }) => theme.colors.goldLight},
-    ${({ theme }) => theme.colors.gold}
-  );
-  font-weight: 900;
+export const BrandIcon = styled.img`
+  width: 54px;
+  height: 54px;
+  object-fit: cover;
+
+  padding: 8px;
+  border-radius: 16px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(231, 189, 105, 0.22),
+      rgba(231, 189, 105, 0.08)
+    );
+
+  border: 1px solid ${({ theme }) => theme.colors.border};
+
+  box-shadow:
+    0 10px 24px rgba(231, 189, 105, 0.18),
+    inset 0 1px 0 rgba(255,255,255,0.08);
 `;
 
 export const BrandName = styled.h3`

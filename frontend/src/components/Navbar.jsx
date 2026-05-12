@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import hero from "../assets/hero.png";
 
 import {
   Nav,
@@ -28,7 +29,7 @@ export default function Navbar() {
   return (
     <Nav>
       <Logo>
-        <LogoIcon>✦</LogoIcon>
+        <LogoIcon src={hero} alt="EduTrack Logo"/>
         EduTrack
       </Logo>
 

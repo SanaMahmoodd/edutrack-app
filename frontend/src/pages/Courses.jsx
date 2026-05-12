@@ -7,8 +7,8 @@ import ConfirmModal from "../components/ConfirmModal";
 
 import useNotification from "../hooks/useNotification";
 
-import Button from "../ui/Button";
-import Card from "../ui/Card";
+import Button from "../ui/ButtonUI";
+import Card from "../ui/CardUI";
 
 import {
   Page,

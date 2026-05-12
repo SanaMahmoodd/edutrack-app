@@ -21,20 +21,34 @@ export const Nav = styled.nav`
 export const Logo = styled.div`
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
   color: ${({ theme }) => theme.colors.text};
-  font-weight: 900;
-  font-size: 18px;
 `;
 
-export const LogoIcon = styled.span`
-  width: 36px;
-  height: 36px;
-  display: grid;
-  place-items: center;
-  border-radius: 12px;
-  color: #10141c;
-  background: linear-gradient(135deg, ${({ theme }) => theme.colors.goldLight}, ${({ theme }) => theme.colors.gold});
+export const LogoIcon = styled.img`
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+
+  padding: 6px;
+  border-radius: 14px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(231, 189, 105, 0.22),
+      rgba(231, 189, 105, 0.08)
+    );
+
+  border: 1px solid ${({ theme }) => theme.colors.border};
+
+  box-shadow:
+    0 10px 24px rgba(231, 189, 105, 0.18),
+    inset 0 1px 0 rgba(255,255,255,0.08);
 `;
 
 export const Links = styled.div`

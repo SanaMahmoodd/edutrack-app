@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import Button from "../ui/Button";
-import Card from "../ui/Card";
+import Button from "../ui/ButtonUI";
+import Card from "../ui/CardUI";
 
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -42,9 +42,19 @@ import {
   updateStudent,
 } from "../api/studentService";
 
+import { getCourses } from "../api/courseService";
+
 export default function Students() {
   const [students, setStudents] = useState([]);
-  const [form, setForm] = useState({ name: "", email: "" });
+  const [courses, setCourses] = useState([]);
+
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    course: "",
+    gpa: "",
+  });
+
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -59,25 +69,29 @@ export default function Students() {
   const { notification, showNotification } = useNotification();
 
   useEffect(() => {
-    async function fetchStudents() {
+    async function fetchData() {
       try {
-        const data = await getStudents();
-        setStudents(data);
+        const studentsData = await getStudents();
+        const coursesData = await getCourses();
+
+        setStudents(studentsData);
+        setCourses(coursesData);
       } catch (error) {
-        console.error("Failed to fetch students:", error);
-        showNotification("Failed to load students.", "error");
+        console.error("Failed to fetch data:", error);
+        showNotification("Failed to load students or courses.", "error");
       } finally {
         setLoading(false);
       }
     }
 
-    fetchStudents();
+    fetchData();
   }, []);
 
   const filteredStudents = students.filter((student) => {
     const searchMatch =
       student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.email.toLowerCase().includes(searchTerm.toLowerCase());
+      student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.course?.toLowerCase().includes(searchTerm.toLowerCase());
 
     if (filterType === "all") return searchMatch;
 
@@ -100,21 +114,36 @@ export default function Students() {
     startIndex + studentsPerPage
   );
 
+  function emptyForm() {
+    return {
+      name: "",
+      email: "",
+      course: "",
+      gpa: "",
+    };
+  }
+
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
 
   function buildStudentPayload() {
     return {
-      ...form,
-      course: "React",
-      gpa: 3.7,
+      name: form.name,
+      email: form.email,
+      course: form.course,
+      gpa: Number(form.gpa),
       status: "Active",
     };
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
+
+    if (!form.course) {
+      showNotification("Please select a course.", "error");
+      return;
+    }
 
     const payload = buildStudentPayload();
 
@@ -129,7 +158,7 @@ export default function Students() {
         );
 
         setEditingId(null);
-        setForm({ name: "", email: "" });
+        setForm(emptyForm());
         showNotification("Student updated successfully.");
       } catch (error) {
         console.error("Failed to update student:", error);
@@ -143,7 +172,7 @@ export default function Students() {
       const createdStudent = await createStudent(payload);
 
       setStudents([createdStudent, ...students]);
-      setForm({ name: "", email: "" });
+      setForm(emptyForm());
       setCurrentPage(1);
       showNotification("Student added successfully.");
     } catch (error) {
@@ -158,6 +187,8 @@ export default function Students() {
     setForm({
       name: student.name,
       email: student.email,
+      course: student.course || "",
+      gpa: student.gpa || "",
     });
 
     window.scrollTo({
@@ -168,7 +199,7 @@ export default function Students() {
 
   function handleCancelEdit() {
     setEditingId(null);
-    setForm({ name: "", email: "" });
+    setForm(emptyForm());
   }
 
   function openDeleteModal(id) {
@@ -243,7 +274,7 @@ export default function Students() {
           <ToolsBar>
             <Input
               type="text"
-              placeholder="Search by name or email..."
+              placeholder="Search by name, email, or course..."
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value);
@@ -283,6 +314,33 @@ export default function Students() {
               required
             />
 
+            <Select
+              name="course"
+              value={form.course}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Select course</option>
+
+              {courses.map((course) => (
+                <option key={course.id} value={course.name}>
+                  {course.name}
+                </option>
+              ))}
+            </Select>
+
+            <Input
+              name="gpa"
+              type="number"
+              step="0.001"
+              min="0"
+              max="4"
+              placeholder="GPA"
+              value={form.gpa}
+              onChange={handleChange}
+              required
+            />
+
             <FormButtons>
               <Button type="submit">
                 {editingId ? "Update" : "Add Student"}
@@ -307,6 +365,10 @@ export default function Students() {
               <StudentName>{student.name}</StudentName>
 
               <StudentEmail>{student.email}</StudentEmail>
+
+              <StudentEmail>
+                {student.course || "No course"} • GPA {student.gpa ?? "N/A"}
+              </StudentEmail>
 
               <Actions>
                 <ActionButton
