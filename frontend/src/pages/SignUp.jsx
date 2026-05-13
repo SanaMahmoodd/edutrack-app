@@ -13,6 +13,16 @@ import {
   AuthLeft,
   AuthTitle,
   AuthSubtitle,
+  Agree,
+  OrDivider,
+  GoogleButton,
+  AuthRight,
+  GoldCircle,
+  Spark,
+  Line,
+  HeroWrap,
+  AuthRightTitle,
+  RightText,
 } from "../ui/AuthLayout";
 
 import hero from "../assets/hero.png";
@@ -110,57 +120,53 @@ export default function SignUp() {
               error={errors.confirmPassword}
             />
 
-            <label className="agree">
+            <Agree>
               <input type="checkbox" required defaultChecked />
 
               <span>
                 I agree to the <b>Terms of Service</b> and{" "}
                 <b>Privacy Policy</b>
               </span>
-            </label>
+            </Agree>
 
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting ? "Creating account..." : "Sign Up"}
             </Button>
 
-            <div className="or">
+            <OrDivider>
               <span></span>
               OR
               <span></span>
-            </div>
+            </OrDivider>
 
-            <button
-              className="google-btn"
-              type="button"
-              onClick={() => navigate("/login")}
-            >
+            <GoogleButton type="button" onClick={() => navigate("/login")}>
               Already have an account? Login
-            </button>
+            </GoogleButton>
           </form>
         </AuthLeft>
 
-        <div className="auth-right">
-          <div className="gold-circle big"></div>
-          <div className="gold-circle small"></div>
+        <AuthRight>
+          <GoldCircle $big />
+          <GoldCircle $small />
 
-          <span className="spark spark1"></span>
-          <span className="spark spark2"></span>
-          <span className="spark spark3"></span>
+          <Spark $one />
+          <Spark $two />
+          <Spark $three />
 
-          <span className="line line1"></span>
-          <span className="line line2"></span>
+          <Line $one />
+          <Line $two />
 
-          <div className="hero-wrap">
+          <HeroWrap>
             <img src={hero} alt="Graduation cap" />
-          </div>
+          </HeroWrap>
 
-          <h2>Smart. Simple. Academic.</h2>
+          <AuthRightTitle>Smart. Simple. Academic.</AuthRightTitle>
 
-          <p className="right-text">
+          <RightText>
             Manage students, courses, and progress <br />
             all in one beautiful platform.
-          </p>
-        </div>
+          </RightText>
+        </AuthRight>
       </AuthCard>
     </AuthPage>
   );

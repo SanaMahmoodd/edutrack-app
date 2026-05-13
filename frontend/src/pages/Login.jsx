@@ -13,6 +13,15 @@ import {
   AuthLeft,
   AuthTitle,
   AuthSubtitle,
+  OrDivider,
+  GoogleButton,
+  AuthRight,
+  GoldCircle,
+  Spark,
+  Line,
+  HeroWrap,
+  AuthRightTitle,
+  RightText,
 } from "../ui/AuthLayout";
 
 import hero from "../assets/hero.png";
@@ -87,44 +96,40 @@ export default function Login() {
               {isSubmitting ? "Logging in..." : "Login"}
             </Button>
 
-            <div className="or">
+            <OrDivider $login>
               <span></span>
               OR
               <span></span>
-            </div>
+            </OrDivider>
 
-            <button
-              type="button"
-              className="google-btn"
-              onClick={() => navigate("/signup")}
-            >
+            <GoogleButton type="button" onClick={() => navigate("/signup")}>
               Create new account
-            </button>
+            </GoogleButton>
           </form>
         </AuthLeft>
 
-        <div className="auth-right">
-          <div className="gold-circle big"></div>
-          <div className="gold-circle small"></div>
+        <AuthRight>
+          <GoldCircle $big />
+          <GoldCircle $small />
 
-          <span className="spark spark1"></span>
-          <span className="spark spark2"></span>
-          <span className="spark spark3"></span>
+          <Spark $one />
+          <Spark $two />
+          <Spark $three />
 
-          <span className="line line1"></span>
-          <span className="line line2"></span>
+          <Line $one />
+          <Line $two />
 
-          <div className="hero-wrap">
+          <HeroWrap>
             <img src={hero} alt="Graduation cap" />
-          </div>
+          </HeroWrap>
 
-          <h2>Smart. Simple. Academic.</h2>
+          <AuthRightTitle>Smart. Simple. Academic.</AuthRightTitle>
 
-          <p className="right-text">
+          <RightText>
             Manage students, courses, and progress <br />
             all in one beautiful platform.
-          </p>
-        </div>
+          </RightText>
+        </AuthRight>
       </AuthCard>
     </AuthPage>
   );
