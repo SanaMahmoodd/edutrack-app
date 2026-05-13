@@ -61,7 +61,7 @@ The student form supports full name, email, course selection from existing cours
 
 Each student has an individual details page with academic summary, contact information, recent activity, and performance overview.
 
-![Student Details Screenshot](./screenshots/deletestudent.png)
+![Student Details Screenshot](./screenshots/studentsdeatiles.png)
 
 ---
 
