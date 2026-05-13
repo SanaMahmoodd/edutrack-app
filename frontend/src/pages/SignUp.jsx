@@ -15,7 +15,6 @@ import {
   AuthSubtitle,
 } from "../ui/AuthLayout";
 
-import "../styles/Auth.css";
 import hero from "../assets/hero.png";
 
 const schema = yup.object({
